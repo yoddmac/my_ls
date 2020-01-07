@@ -6,7 +6,6 @@
 */
 
 #include "lib/my/my.h"
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -15,7 +14,6 @@
 
 void my_ls(DIR *dir)
 {
-    struct dirent *dirent;
     DIR *rep = opendir (".");
 
     while ((dirent = readdir(dir)) != 0) {
@@ -26,10 +24,6 @@ void my_ls(DIR *dir)
 
 void my_ls_l(DIR *dir)
 {
-    struct dirent *dirent;
-    struct stat sb;
-    DIR *rep = opendir(".");
-
     my_putchar(sb.st_mode & S_IFMT);
     my_printf((sb.st_mode & S_IRUSR) ? "r" : "-");
     my_printf((sb.st_mode & S_IWUSR) ? "x" : "-");
@@ -44,11 +38,10 @@ void my_ls_l(DIR *dir)
 
 int main (int ac, char **av)
 {
-    struct dirent *dirent;
     DIR *rep = opendir (".");
 
     if (ac == 1)
         my_ls(rep);
-    if (ac == 2 && my_strcmp(av[1], "-l"))
+    if (ac == 2 && my_strcmp(av, "-l"))
         my_ls_l(rep);
 }
