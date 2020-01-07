@@ -12,7 +12,7 @@ RM	=	rm -rf
 NAME	=	my_ls
 
 CFLAGS	+=	-W -Wall -Wextra -I./include
-LDFLAGS += 	-I./my/include/ -lmy -L. -g
+LDFLAGS += 	-I./my/include -lmy -L. -g
 
 SRC	=	my_ls.c
 
