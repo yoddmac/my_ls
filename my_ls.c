@@ -6,42 +6,110 @@
 */
 
 #include "lib/my/my.h"
-#include <stdio.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <time.h>
 
-void my_ls(DIR *dir)
+
+void my_ls(void)
 {
     DIR *rep = opendir (".");
+    //struct stat sb;
+    struct dirent *dirent;
 
-    while ((dirent = readdir(dir)) != 0) {
-    if (dirent->d_name != rep)
-    my_printf("%s\n", dirent->d_name);
+    while ((dirent = readdir(rep))) {
+        if (my_strcmp(dirent->d_name, ".") != 0 && my_strcmp(dirent->d_name, "..")
+            != 0 && my_strcmp(dirent->d_name, ".git") != 0)
+            my_printf("%s\n", dirent->d_name);
     }
+    closedir(rep);
 }
 
-void my_ls_l(DIR *dir)
+void my_ls_l(void)
 {
-    my_putchar(sb.st_mode & S_IFMT);
-    my_printf((sb.st_mode & S_IRUSR) ? "r" : "-");
-    my_printf((sb.st_mode & S_IWUSR) ? "x" : "-");
-    my_printf((sb.st_mode & S_IXUSR) ? "w" : "-");
-    my_printf((sb.st_mode & S_IRGRP) ? "x" : "-");
-    my_printf((sb.st_mode & S_IWGRP) ? "w" : "-");
-    my_printf((sb.st_mode & S_IXGRP) ? "x" : "-");
-    my_printf((sb.st_mode & S_IROTH) ? "r" : "-");
-    my_printf((sb.st_mode & S_IWOTH) ? "w" : "-");
-    my_printf((sb.st_mode & S_IXOTH) ? "x" : "-");
+    DIR *rep = opendir(".");
+    struct dirent *dirent;
+    struct stat stats;
+    struct passwd *pass;
+    struct group *grp;
+    pass = getpwuid(stats.st_uid);
+    grp = getgrgid(stats.st_uid);
+    dirent = readdir(rep);
+    stat(dirent->d_name, &stats);
+
+    display_block();
+    my_putchar('\n');
+    while ((dirent = readdir(rep)) != NULL) {
+        if (my_strcmp(dirent->d_name, ".") != 0 && my_strcmp(dirent->d_name, "..")
+            != 0 && my_strcmp(dirent->d_name, ".git") != 0) {
+            my_acl(dirent, stats);
+            info(dirent, stats, pass, grp);
+        }
+    }
+    closedir(rep);
+    }
+
+void my_acl(struct dirent *dirent, struct stat stats)
+{
+    stat(dirent->d_name, &stats);
+    my_putstr((S_ISDIR(stats.st_mode)) ? "d" : "-");
+    my_printf((stats.st_mode & S_IRUSR) ? "r" : "-");
+    my_printf((stats.st_mode & S_IWUSR) ? "x" : "-");
+    my_printf((stats.st_mode & S_IXUSR) ? "w" : "-");
+    my_printf((stats.st_mode & S_IRGRP) ? "x" : "-");
+    my_printf((stats.st_mode & S_IWGRP) ? "w" : "-");
+    my_printf((stats.st_mode & S_IXGRP) ? "x" : "-");
+    my_printf((stats.st_mode & S_IROTH) ? "r" : "-");
+    my_printf((stats.st_mode & S_IWOTH) ? "w" : "-");
+    my_printf((stats.st_mode & S_IXOTH) ? "x" : "-");
+}
+
+void info(struct dirent *dirent, struct stat stats, struct passwd *pass, struct group *grp)
+{
+    pass = malloc(sizeof(struct passwd));
+    pass = getpwuid(stats.st_uid);
+    grp = getgrgid(stats.st_gid);
+    stat(dirent->d_name, &stats);
+
+    my_putstr(" ");
+    my_put_nbr(stats.st_nlink);
+    my_putstr(" ");
+    my_printf("%s", pass->pw_name);
+    my_putstr(" ");
+    my_printf("%s", grp->gr_name);
+    my_putstr(" ");
+    my_put_nbr(stats.st_size);
+    my_putstr(" ");
+    write(1, (ctime(&stats.st_mtime) + 4), \
+				(my_strlen(ctime(&stats.st_mtime)) - 13));
+    my_putstr(" ");
+    my_putstr(dirent->d_name);
+    my_putstr("\n");
+}
+
+void display_block()
+{
+    DIR *dir;
+    struct stat stats;
+    struct dirent *dirent;
+    int block = 0;
+
+    dir = opendir(".");
+    if (dir != NULL) {
+        while((dirent = readdir(dir)) != NULL) {
+            if ((*dirent->d_name) == '.') {
+            } else {
+                stat(dirent->d_name, &stats);
+                block += stats.st_blocks;
+            }
+        }
+    }
+    my_putstr("total ");
+    my_put_nbr(block );
 }
 
 int main (int ac, char **av)
 {
-    DIR *rep = opendir (".");
-
     if (ac == 1)
-        my_ls(rep);
-    if (ac == 2 && my_strcmp(av, "-l"))
-        my_ls_l(rep);
+        my_ls();
+    if (ac == 2 && my_strcmp(av[1], "-l") == 0) {
+            my_ls_l();
+    }
 }
