@@ -37,7 +37,6 @@ fclean:
 	$(RM) libmy.a
 	$(RM) ./my/libmy.a
 	$(RM) ./lib/my/libmy.a
-	$(RM) ./lib/my/include/my.h
 
 re:	fclean all
 
