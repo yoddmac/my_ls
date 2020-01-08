@@ -7,22 +7,26 @@
 
 #include "lib/my/my.h"
 
-
 void my_ls(void)
 {
     DIR *rep = opendir (".");
-    //struct stat sb;
     struct dirent *dirent;
 
     while ((dirent = readdir(rep))) {
-        if (my_strcmp(dirent->d_name, ".") != 0 && my_strcmp(dirent->d_name, "..")
+        if (my_strcmp(dirent->d_name, ".") != 0
+            && my_strcmp(dirent->d_name, "..")
             != 0 && my_strcmp(dirent->d_name, ".git") != 0)
             my_printf("%s\n", dirent->d_name);
     }
     closedir(rep);
 }
 
-void my_ls_l(void)
+void my_ls_d(void)
+{
+    my_putchar('.');
+}
+
+void init_ls_l(void)
 {
     DIR *rep = opendir(".");
     struct dirent *dirent;
@@ -33,18 +37,28 @@ void my_ls_l(void)
     grp = getgrgid(stats.st_uid);
     dirent = readdir(rep);
     stat(dirent->d_name, &stats);
+}
+
+void my_ls_l(void)
+{
+    DIR *rep = opendir(".");
+    pass = getpwuid(stats.st_uid);
+    grp = getgrgid(stats.st_uid);
+    dirent = readdir(rep);
+    stat(dirent->d_name, &stats);
 
     display_block();
     my_putchar('\n');
     while ((dirent = readdir(rep)) != NULL) {
-        if (my_strcmp(dirent->d_name, ".") != 0 && my_strcmp(dirent->d_name, "..")
+        if (my_strcmp(dirent->d_name, ".") != 0 &&
+            my_strcmp(dirent->d_name, "..")
             != 0 && my_strcmp(dirent->d_name, ".git") != 0) {
             my_acl(dirent, stats);
-            info(dirent, stats, pass, grp);
+            info();
         }
     }
     closedir(rep);
-    }
+}
 
 void my_acl(struct dirent *dirent, struct stat stats)
 {
@@ -61,7 +75,7 @@ void my_acl(struct dirent *dirent, struct stat stats)
     my_printf((stats.st_mode & S_IXOTH) ? "x" : "-");
 }
 
-void info(struct dirent *dirent, struct stat stats, struct passwd *pass, struct group *grp)
+void info(void)
 {
     pass = malloc(sizeof(struct passwd));
     pass = getpwuid(stats.st_uid);
@@ -77,23 +91,20 @@ void info(struct dirent *dirent, struct stat stats, struct passwd *pass, struct 
     my_putstr(" ");
     my_put_nbr(stats.st_size);
     my_putstr(" ");
-    write(1, (ctime(&stats.st_mtime) + 4), \
-				(my_strlen(ctime(&stats.st_mtime)) - 13));
+    my_puttime();
     my_putstr(" ");
     my_putstr(dirent->d_name);
     my_putstr("\n");
 }
 
-void display_block()
+void display_block(void)
 {
     DIR *dir;
-    struct stat stats;
-    struct dirent *dirent;
     int block = 0;
 
     dir = opendir(".");
     if (dir != NULL) {
-        while((dirent = readdir(dir)) != NULL) {
+        while ((dirent = readdir(dir)) != NULL) {
             if ((*dirent->d_name) == '.') {
             } else {
                 stat(dirent->d_name, &stats);
@@ -107,9 +118,11 @@ void display_block()
 
 int main (int ac, char **av)
 {
+
     if (ac == 1)
         my_ls();
-    if (ac == 2 && my_strcmp(av[1], "-l") == 0) {
-            my_ls_l();
-    }
+    if (my_strcmp(av[1], "-l") == 0)
+        my_ls_l();
+    if ((ac == 2 && my_strcmp(av[1], "-d") == 0))
+        my_ls_d();
 }
