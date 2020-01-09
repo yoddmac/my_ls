@@ -33,9 +33,9 @@ void my_acl(struct dirent *dirent, struct stat stats)
     stat(dirent->d_name, &stats);
     my_putstr((S_ISDIR(stats.st_mode)) ? "d" : "-");
     my_printf((stats.st_mode & S_IRUSR) ? "r" : "-");
-    my_printf((stats.st_mode & S_IWUSR) ? "x" : "-");
-    my_printf((stats.st_mode & S_IXUSR) ? "w" : "-");
-    my_printf((stats.st_mode & S_IRGRP) ? "x" : "-");
+    my_printf((stats.st_mode & S_IWUSR) ? "w" : "-");
+    my_printf((stats.st_mode & S_IXUSR) ? "x" : "-");
+    my_printf((stats.st_mode & S_IRGRP) ? "r" : "-");
     my_printf((stats.st_mode & S_IWGRP) ? "w" : "-");
     my_printf((stats.st_mode & S_IXGRP) ? "x" : "-");
     my_printf((stats.st_mode & S_IROTH) ? "r" : "-");
@@ -45,6 +45,7 @@ void my_acl(struct dirent *dirent, struct stat stats)
 
 void info(void)
 {
+    char *date = ctime(&stats.st_mtime);
     pass = malloc(sizeof(struct passwd));
     pass = getpwuid(stats.st_uid);
     grp = getgrgid(stats.st_gid);
@@ -53,13 +54,14 @@ void info(void)
     my_putstr(" ");
     my_put_nbr(stats.st_nlink);
     my_putstr(" ");
-    my_printf("%s", pass->pw_name);
+    my_putstr(pass->pw_name);
     my_putstr(" ");
-    my_printf("%s", grp->gr_name);
+    my_putstr(grp->gr_name);
     my_putstr(" ");
     my_put_nbr(stats.st_size);
     my_putstr(" ");
-    my_puttime();
+    for (int i = 4; i < 16; i++)
+        my_putchar(date[i]);
     my_putstr(" ");
     my_putstr(dirent->d_name);
     my_putstr("\n");
@@ -73,7 +75,7 @@ void display_block(void)
     dir = opendir(".");
     if (dir != NULL) {
         while ((dirent = readdir(dir)) != NULL) {
-            if ((*dirent->d_name) == '.') {
+            if ((*dirent->d_name) == ".") {
             } else {
                 stat(dirent->d_name, &stats);
                 block += stats.st_blocks;
@@ -88,8 +90,8 @@ int main (int ac, char **av)
 {
     if (ac == 1)
         my_ls();
-    if (ac == 2)
-        my_ls_in(av);
+    //if (ac == 2)
+        //my_ls_in(av);
     if ((ac == 2 && my_strcmp(av[1], "-l") == 0))
         my_ls_l();
     if ((ac == 2 && my_strcmp(av[1], "-d") == 0))
