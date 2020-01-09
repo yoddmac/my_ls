@@ -7,23 +7,6 @@
 
 #include "lib/my/include/my.h"
 
-void my_ls(char const *path)
-{
-    DIR *rep = opendir (".");
-    while ((dirent = readdir(rep)) != NULL) {
-        if (my_strcmp(dirent->d_name, ".") != 0
-            && my_strcmp(dirent->d_name, "..")
-            != 0 && my_strcmp(dirent->d_name, ".git") != 0)
-            my_printf("%s\n", dirent->d_name);
-    }
-    closedir(rep);
-}
-
-void my_ls_d(void)
-{
-    my_putchar('.');
-}
-
 void my_ls_l(void)
 {
     DIR *rep = opendir(".");
@@ -35,8 +18,8 @@ void my_ls_l(void)
     display_block();
     my_putchar('\n');
     while ((dirent = readdir(rep)) != NULL) {
-        if (my_strcmp(dirent->d_name, ".") != 0 &&
-            my_strcmp(dirent->d_name, "..")
+        if (my_strcmp(dirent->d_name, ".") != 0
+            && my_strcmp(dirent->d_name, "..")
             != 0 && my_strcmp(dirent->d_name, ".git") != 0) {
             my_acl(dirent, stats);
             info();
@@ -103,9 +86,10 @@ void display_block(void)
 
 int main (int ac, char **av)
 {
-
     if (ac == 1)
-        my_ls(av[1]);
+        my_ls();
+    if (ac == 2)
+        my_ls_in(av);
     if ((ac == 2 && my_strcmp(av[1], "-l") == 0))
         my_ls_l();
     if ((ac == 2 && my_strcmp(av[1], "-d") == 0))

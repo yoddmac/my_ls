@@ -9,6 +9,6 @@
 
 int my_puttime(void)
 {
-write(1, (ctime(&stats.st_mtime) + 4), \
-				(my_strlen(ctime(&stats.st_mtime)) - 13));
+	write(1, (ctime(&stats.st_mtime) + 4),
+		(my_strlen(ctime(&stats.st_mtime)) - 13));
 }

@@ -14,7 +14,8 @@ NAME	=	my_ls
 CFLAGS	+=	-W -Wall -Wextra -I./include
 LDFLAGS += 	-I./my/include/ -lmy -L. -g
 
-SRC	=	my_ls.c
+SRC	=	my_ls.c \
+		my_fonc.c
 
 OBJ	=	$(SRC:.c=.o)
 

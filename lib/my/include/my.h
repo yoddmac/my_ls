@@ -19,7 +19,9 @@
 #include <sys/types.h>
 #include <time.h>
 
-void my_ls(void);
+int my_puttime(void);
+void my_ls_in(char const **av);
+void my_ls();
 void my_ls_d(void);
 void init_ls_l(void);
 void my_ls_l(void);
