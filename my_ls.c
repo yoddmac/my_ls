@@ -7,10 +7,10 @@
 
 #include "lib/my/include/my.h"
 
-void my_ls(char *path)
+void my_ls(char const *path)
 {
-    DIR *rep = opendir (path);
-    while ((dirent = readdir(rep))) {
+    DIR *rep = opendir (".");
+    while ((dirent = readdir(rep)) != NULL) {
         if (my_strcmp(dirent->d_name, ".") != 0
             && my_strcmp(dirent->d_name, "..")
             != 0 && my_strcmp(dirent->d_name, ".git") != 0)
@@ -104,7 +104,7 @@ void display_block(void)
 int main (int ac, char **av)
 {
 
-    //if (ac == 1)
+    if (ac == 1)
         my_ls(av[1]);
     if ((ac == 2 && my_strcmp(av[1], "-l") == 0))
         my_ls_l();
