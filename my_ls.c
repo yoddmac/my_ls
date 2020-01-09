@@ -5,13 +5,11 @@
 ** lq
 */
 
-#include "lib/my/my.h"
+#include "lib/my/include/my.h"
 
-void my_ls(void)
+void my_ls(char *path)
 {
-    DIR *rep = opendir (".");
-    struct dirent *dirent;
-
+    DIR *rep = opendir (path);
     while ((dirent = readdir(rep))) {
         if (my_strcmp(dirent->d_name, ".") != 0
             && my_strcmp(dirent->d_name, "..")
@@ -24,19 +22,6 @@ void my_ls(void)
 void my_ls_d(void)
 {
     my_putchar('.');
-}
-
-void init_ls_l(void)
-{
-    DIR *rep = opendir(".");
-    struct dirent *dirent;
-    struct stat stats;
-    struct passwd *pass;
-    struct group *grp;
-    pass = getpwuid(stats.st_uid);
-    grp = getgrgid(stats.st_uid);
-    dirent = readdir(rep);
-    stat(dirent->d_name, &stats);
 }
 
 void my_ls_l(void)
@@ -119,9 +104,9 @@ void display_block(void)
 int main (int ac, char **av)
 {
 
-    if (ac == 1)
-        my_ls();
-    if (my_strcmp(av[1], "-l") == 0)
+    //if (ac == 1)
+        my_ls(av[1]);
+    if ((ac == 2 && my_strcmp(av[1], "-l") == 0))
         my_ls_l();
     if ((ac == 2 && my_strcmp(av[1], "-d") == 0))
         my_ls_d();
