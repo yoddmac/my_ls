@@ -90,7 +90,7 @@ int main (int ac, char **av)
 {
     if (ac == 1)
         my_ls();
-    if ((ac == 2 && my_strcmp(av[1], "-l") == 0))
+    if ((ac == 3 && my_strcmp(av[1], "-l") == 0))
         my_ls_l();
     else if (ac == 2) {
         my_ls_in(av);
