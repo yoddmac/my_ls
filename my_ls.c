@@ -12,7 +12,6 @@ void my_ls_l(void)
     DIR *rep = opendir(".");
     pass = getpwuid(stats.st_uid);
     grp = getgrgid(stats.st_uid);
-    dirent = readdir(rep);
     stat(dirent->d_name, &stats);
 
     display_block();
@@ -83,14 +82,16 @@ void display_block(void)
         }
     }
     my_putstr("total ");
-    my_put_nbr(block );
+    my_put_nbr(block);
 }
 
 int main (int ac, char **av)
 {
-    if (ac == 1)
+    if (ac == 1) {
         my_ls();
-    if ((ac == 3 && my_strcmp(av[1], "-l") == 0))
+    }
+    if ((ac == 2 && my_strcmp(av[1], "-l") == 0)
+    || ac == 3 && my_strcmp(av[1], "-l") == 0)
         my_ls_l();
     else if (ac == 2) {
         my_ls_in(av);
